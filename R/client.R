@@ -101,7 +101,8 @@ config_template <- function(git_url){
 #' @export
 #' @rdname jenkins
 #' @param update update the xml config of existing repos.
-sync_jenkins_ropensci <- function(update = FALSE){
+#' @param remove delete jobs that are no longer in the registry
+sync_jenkins_ropensci <- function(update = FALSE, remove = TRUE){
   jk <- jenkins('http://jenkins.ropensci.org')
   jobs <- jk$job_list()
   url <- "https://ropensci.github.io/roregistry/registry.json"
@@ -121,6 +122,14 @@ sync_jenkins_ropensci <- function(update = FALSE){
       jk$job_create(name = name, xml_string = xml)
     }
     cat("OK!\n")
+  }
+  if(isTRUE(remove)){
+    gone <- !(jobs$name %in% packages$name)
+    lapply(jobs$name[gone], function(name){
+      cat(sprintf("Deleting job %s which is no longer in the roregistry...", name))
+      jk$job_delete(name)
+      cat("OK!\n")
+    })
   }
   jk$job_list()
 }
