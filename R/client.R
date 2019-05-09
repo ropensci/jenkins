@@ -100,7 +100,8 @@ config_template <- function(git_url){
 
 #' @export
 #' @rdname jenkins
-sync_jenkins_ropensci <- function(){
+#' @param update update the xml config of existing repos.
+sync_jenkins_ropensci <- function(update = FALSE){
   jk <- jenkins('http://jenkins.ropensci.org')
   jobs <- jk$job_list()
   url <- "https://ropensci.github.io/roregistry/registry.json"
@@ -109,8 +110,12 @@ sync_jenkins_ropensci <- function(){
     name <- packages[i, "name"]
     xml <- config_template(packages[i, "url"])
     if(name %in% jobs$name){
-      cat(sprintf("Updating job config for %s...", name))
-      jk$job_update(name = name, xml_string = xml)
+      if(isTRUE(update)){
+        cat(sprintf("Updating job config for %s...", name))
+        jk$job_update(name = name, xml_string = xml)
+      } else {
+        cat(sprintf("Job config for %s already exists...", name))
+      }
     } else {
       cat(sprintf("Creating new job for %s...", name))
       jk$job_create(name = name, xml_string = xml)

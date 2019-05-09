@@ -11,7 +11,7 @@ jenkins(server = "http://jenkins.ropensci.org", username = "jeroen",
 
 config_template(git_url)
 
-sync_jenkins_ropensci()
+sync_jenkins_ropensci(update = FALSE)
 }
 \arguments{
 \item{server}{naked url of the server}
@@ -23,6 +23,8 @@ sync_jenkins_ropensci()
 \item{verbose}{show http output}
 
 \item{git_url}{HTTPS git url of the target repository}
+
+\item{update}{update the xml config of existing repos.}
 }
 \description{
 Some wrappers to control jobs and builds on a Jenkins server.
