@@ -4,11 +4,12 @@
 #'
 #' @export
 #' @import curl
+#' @rdname jenkins
 #' @param server naked url of the server
 #' @param username name of the user to login
 #' @param token authentication token (or password)
 #' @param verbose show http output
-jenkins <- function(server = 'http://172.104.227.59:8080', username = 'jeroen',
+jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
                     token = jenkins_pat(), verbose = FALSE){
   server <- gsub("/$", "", server)
   GET_JSON <- function(endpoint = "/"){
@@ -84,6 +85,39 @@ jenkins <- function(server = 'http://172.104.227.59:8080', username = 'jeroen',
     }
     structure(environment(), class=c("jenkins", "jeroen", "environment"))
   })
+}
+
+#' @export
+#' @param git_url HTTPS git url of the target repository
+#' @rdname jenkins
+config_template <- function(git_url){
+  if(!grepl("^https://", git_url))
+    stop("Please use https git URL")
+  template <- system.file('templates/config.xml', package = 'jenkins')
+  input <- rawToChar(readBin(template, raw(), file.info(template)$size))
+  gsub("INSERT_GIT_REPO_URL", git_url, input, fixed = TRUE)
+}
+
+#' @export
+#' @rdname jenkins
+sync_jenkins_ropensci <- function(){
+  jk <- jenkins('http://jenkins.ropensci.org')
+  jobs <- jk$job_list()
+  url <- "https://ropensci.github.io/roregistry/registry.json"
+  packages <- jsonlite::fromJSON(url)$packages
+  for(i in seq_len(nrow(packages))){
+    name <- packages[i, "name"]
+    xml <- config_template(packages[i, "url"])
+    if(name %in% jobs$name){
+      cat(sprintf("Updating job config for %s...", name))
+      jk$job_update(name = name, xml_string = xml)
+    } else {
+      cat(sprintf("Creating new job for %s...", name))
+      jk$job_create(name = name, xml_string = xml)
+    }
+    cat("OK!\n")
+  }
+  jk$job_list()
 }
 
 jenkins_pat <- function(){

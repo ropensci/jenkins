@@ -2,10 +2,16 @@
 % Please edit documentation in R/client.R
 \name{jenkins}
 \alias{jenkins}
+\alias{config_template}
+\alias{sync_jenkins_ropensci}
 \title{Jenkins}
 \usage{
-jenkins(server = "http://172.104.227.59:8080", username = "jeroen",
+jenkins(server = "http://jenkins.ropensci.org", username = "jeroen",
   token = jenkins_pat(), verbose = FALSE)
+
+config_template(git_url)
+
+sync_jenkins_ropensci()
 }
 \arguments{
 \item{server}{naked url of the server}
@@ -15,6 +21,8 @@ jenkins(server = "http://172.104.227.59:8080", username = "jeroen",
 \item{token}{authentication token (or password)}
 
 \item{verbose}{show http output}
+
+\item{git_url}{HTTPS git url of the target repository}
 }
 \description{
 Some wrappers to control jobs and builds on a Jenkins server.
