@@ -63,10 +63,10 @@ PACKAGE=$(grep &apos;Package:&apos; DESCRIPTION | awk &apos;{print $NF}&apos;)
 echo &quot;PACKAGE NAME: $PACKAGE&quot;
 echo &quot;GIT_BRANCH: $GIT_BRANCH&quot;
 if [ &quot;$GIT_BRANCH&quot; = &quot;origin/master&quot; ]; then
-ID=$(docker create --rm -v data:/data ropensci/docs build &quot;/$BASENAME&quot;)
-else
-ID=$(docker create --rm -v testing:/data ropensci/docs build &quot;/$BASENAME&quot;)
+ENABLE_CACHE=&quot;--env R_LIBS_USER=/cache -v ${BASENAME}_cache:/cache&quot;
+ENABLE_STORE=&quot;-v data:/data&quot;
 fi
+ID=$(docker create --rm $ENABLE_CACHE $ENABLE_STORE ropensci/docs build &quot;/$BASENAME&quot;)
 docker cp $PWD &quot;$ID:/$BASENAME&quot;
 docker start $ID --attach
 if [ &quot;$GIT_BRANCH&quot; = &quot;origin/master&quot; ]; then
