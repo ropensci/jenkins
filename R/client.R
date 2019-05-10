@@ -29,16 +29,19 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
   }
 
   POST_XML <- function(endpoint = "/", data = NULL){
-    buf <- charToRaw(data)
-    size <- length(buf)
-    con <- rawConnection(buf, open = "rb")
-    on.exit(close(con))
-    readfunction <- function(n, ...){
-      readBin(con = con, raw(), n = n)
+    handle <- curl::new_handle(username = username, password = token, verbose = verbose,
+                               httpauth = 1L, post = TRUE)
+    if(length(data)){
+      buf <- charToRaw(data)
+      size <- length(buf)
+      con <- rawConnection(buf, open = "rb")
+      on.exit(close(con))
+      readfunction <- function(n, ...){
+        readBin(con = con, raw(), n = n)
+      }
+      handle_setopt(handle, readfunction = readfunction, postfieldsize_large = size)
+      handle_setheaders(handle, "Content-Type" = "application/xml")
     }
-    handle <- curl::new_handle(username = username, password = token, verbose = verbose, httpauth = 1L,
-                               post = TRUE, readfunction = readfunction, postfieldsize_large = size)
-    handle_setheaders(handle, "Content-Type" = "application/xml")
     url <- paste0(server, sub("/$", "", endpoint))
     req <- curl::curl_fetch_memory(url, handle = handle)
     text <- rawToChar(req$content)
@@ -62,6 +65,11 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     job_get <- function(name){
       GET_DATA(sprintf('/job/%s/config.xml', name))
     }
+    job_build <- function(name){
+      endpoint <- sprintf('/job/%s/build', name)
+      POST_XML(endpoint = endpoint)
+      invisible()
+    }
     job_create <- function(name, xml_string){
       endpoint <- sprintf("/createItem?name=%s", name)
       POST_XML(endpoint = endpoint, data = xml_string)
@@ -74,7 +82,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     }
     job_delete <- function(name){
       endpoint <- sprintf('/job/%s/doDelete', name)
-      POST_XML(endpoint = endpoint, data = "")
+      POST_XML(endpoint = endpoint)
       invisible()
     }
     user_list <- function(){
