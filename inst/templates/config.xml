@@ -52,6 +52,7 @@
     </com.cloudbees.jenkins.GitHubSetCommitStatusBuilder>
     <hudson.tasks.Shell>
       <command>#!/bin/sh
+set -e
 echo &quot;Starting pkgdown build!&quot;
 echo &quot;&quot;
 git log -n1
