@@ -85,6 +85,17 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       POST_XML(endpoint = endpoint)
       invisible()
     }
+    job_build_all <- function(wait = 0.5){
+      jobs <- jk$job_list()$name
+      msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
+      if(isTRUE(askYesNo(msg))){
+        lapply(jobs, function(name){
+          cat("Triggering build for:", name, "\n")
+          jk$job_build(name)
+          Sys.sleep(wait)
+        })
+      }
+    }
     user_list <- function(){
       GET_JSON("/people")
     }
