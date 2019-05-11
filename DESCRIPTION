@@ -9,6 +9,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Imports: 
     curl,
-    jsonlite
+    jsonlite,
+    stringi
 LazyData: true
 RoxygenNote: 6.1.1

@@ -63,25 +63,25 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       info()$jobs
     }
     job_get <- function(name){
-      GET_DATA(sprintf('/job/%s/config.xml', name))
+      GET_DATA(sprintf('/job/%s/config.xml', curl_escape(name)))
     }
     job_build <- function(name){
-      endpoint <- sprintf('/job/%s/build', name)
+      endpoint <- sprintf('/job/%s/build', curl_escape(name))
       POST_XML(endpoint = endpoint)
       invisible()
     }
     job_create <- function(name, xml_string){
-      endpoint <- sprintf("/createItem?name=%s", name)
+      endpoint <- sprintf("/createItem?name=%s", curl_escape(name))
       POST_XML(endpoint = endpoint, data = xml_string)
       invisible()
     }
     job_update <- function(name, xml_string){
-      endpoint <- sprintf('/job/%s/config.xml', name)
+      endpoint <- sprintf('/job/%s/config.xml', curl_escape(name))
       POST_XML(endpoint = endpoint, data = xml_string)
       invisible()
     }
     job_delete <- function(name){
-      endpoint <- sprintf('/job/%s/doDelete', name)
+      endpoint <- sprintf('/job/%s/doDelete', curl_escape(name))
       POST_XML(endpoint = endpoint)
       invisible()
     }
@@ -89,7 +89,30 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       GET_JSON("/people")
     }
     user_get <- function(name = username){
-      GET_JSON(paste0('/user/', name))
+      endpoint <- paste0('/user/', curl_escape(name))
+      GET_JSON(endpoint)
+    }
+    view_create <- function(name, xml_string){
+      endpoint <- sprintf("/createView?name=%s", curl_escape(name))
+      POST_XML(endpoint = endpoint, data = xml_string)
+      invisible()
+    }
+    view_list <- function(){
+      info()$views
+    }
+    job_get <- function(name){
+      endpoint <- sprintf('/view/%s/config.xml', curl_escape(name))
+      GET_DATA(endpoint)
+    }
+    view_update <- function(name, xml_string){
+      endpoint <- sprintf('/view/%s/config.xml', curl_escape(name))
+      POST_XML(endpoint = endpoint, data = xml_string)
+      invisible()
+    }
+    view_delete <- function(name){
+      endpoint <- sprintf('/view/%s/doDelete', curl_escape(name))
+      POST_XML(endpoint = endpoint)
+      invisible()
     }
     structure(environment(), class=c("jenkins", "jeroen", "environment"))
   })
@@ -107,10 +130,22 @@ config_template <- function(git_url){
 }
 
 #' @export
+#' @param view_name Full name (with spaces) of the view
+#' @param view_jobs Character vector with jobs to add to this view
 #' @rdname jenkins
-#' @param update update the xml config of existing repos.
-#' @param remove delete jobs that are no longer in the registry
-sync_jenkins_ropensci <- function(update = FALSE, remove = TRUE){
+view_template <- function(view_jobs){
+  template <- system.file('templates/view.xml', package = 'jenkins')
+  input <- rawToChar(readBin(template, raw(), file.info(template)$size))
+  jobstring <- paste(sprintf('    <string>%s</string>', view_jobs), collapse = "\n")
+  gsub("INSERT_VIEW_JOBS", jobstring, input, fixed = TRUE)
+}
+
+#' @export
+#' @rdname jenkins
+#' @param update_jobs update the xml config of existing repos.
+#' @param remove_jobs delete jobs that are no longer in the registry
+#' @param update_views update the views (per-author package list)
+sync_jenkins_ropensci <- function(update_jobs = FALSE, remove_jobs = TRUE, update_views = TRUE){
   jk <- jenkins('http://jenkins.ropensci.org')
   jobs <- jk$job_list()
   url <- "https://ropensci.github.io/roregistry/registry.json"
@@ -119,7 +154,7 @@ sync_jenkins_ropensci <- function(update = FALSE, remove = TRUE){
     name <- packages[i, "name"]
     xml <- config_template(packages[i, "url"])
     if(name %in% jobs$name){
-      if(isTRUE(update)){
+      if(isTRUE(update_jobs)){
         cat(sprintf("Updating job config for %s...", name))
         jk$job_update(name = name, xml_string = xml)
       } else {
@@ -131,7 +166,7 @@ sync_jenkins_ropensci <- function(update = FALSE, remove = TRUE){
     }
     cat("OK!\n")
   }
-  if(isTRUE(remove)){
+  if(isTRUE(remove_jobs)){
     gone <- !(jobs$name %in% packages$name)
     lapply(jobs$name[gone], function(name){
       cat(sprintf("Deleting job %s which is no longer in the roregistry...", name))
@@ -139,7 +174,37 @@ sync_jenkins_ropensci <- function(update = FALSE, remove = TRUE){
       cat("OK!\n")
     })
   }
-  jk$job_list()
+  if(isTRUE(update_views)){
+    views <- jk$view_list()
+    packages$maintainer <- asciify(packages$maintainer)
+    authors <- unique(packages$maintainer)
+    lapply(authors, function(author){
+      pkg_names = packages[packages$maintainer == author, "name"]
+      if(!length(pkg_names))
+        stop(sprintf("Failed to find packages for author %s", author))
+      xml <- view_template(pkg_names)
+      if(author %in% views$name){
+        cat(sprintf("Updating view for %s...", author))
+        jk$view_update(name = author, xml_string = xml)
+      } else {
+        cat(sprintf("Creating new view for %s...", author))
+        jk$view_create(name = author, xml_string = xml)
+      }
+      cat("OK!\n")
+    })
+    views_gone <- !(views$name %in% c(authors, 'all'))
+    lapply(views$name[views_gone], function(author){
+      cat(sprintf("Deleting view %s which is no longer a maintainer...", author))
+      jk$view_delete(author)
+      cat("OK!\n")
+    })
+  }
+  invisible(jk$info())
+}
+
+# Not sure how well jenkins deals with strange characters...
+asciify <- function(x){
+  gsub("[^a-zA-Z0-9' .-]", "", stringi::stri_trans_general(x, "latin-ascii"))
 }
 
 jenkins_pat <- function(){
