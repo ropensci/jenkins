@@ -111,7 +111,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     view_list <- function(){
       info()$views
     }
-    job_get <- function(name){
+    view_get <- function(name){
       endpoint <- sprintf('/view/%s/config.xml', curl_escape(name))
       GET_DATA(endpoint)
     }
