@@ -2,13 +2,35 @@
 #'
 #' Some wrappers to control jobs and builds on a Jenkins server.
 #'
+#' @examples
+#' \donttest{ # Make a connection
+#' jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
+#'
+#' # Supported operations
+#' jk$info()
+#' jk$job_build(name)
+#' jk$job_build_all(wait = 0.5)
+#' jk$job_create(name, xml_string)
+#' jk$job_delete(name)
+#' jk$job_get(name)
+#' jk$job_list()
+#' jk$job_update(name, xml_string)
+#' jk$user_get(name = username)
+#' jk$user_list()
+#' jk$view_create(name, xml_string)
+#' jk$view_delete(name)
+#' jk$view_get(name)
+#' jk$view_list()
+#' jk$view_update(name, xml_string)
+#' }
+#'
 #' @export
 #' @import curl
 #' @rdname jenkins
-#' @param server naked url of the server
-#' @param username name of the user to login
-#' @param token authentication token (or password)
-#' @param verbose show http output
+#' @param server base url of the jenkins server
+#' @param username name of the jenkins user to login
+#' @param token authentication token (or password) for your jenkins server.
+#' @param verbose print http output for debugging
 jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
                     token = jenkins_pat(), verbose = FALSE){
   server <- gsub("/$", "", server)
@@ -60,7 +82,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       GET_JSON()
     }
     job_list <- function(){
-      info()$jobs
+      tibblify(info()$jobs)
     }
     job_get <- function(name){
       GET_DATA(sprintf('/job/%s/config.xml', curl_escape(name)))
@@ -97,7 +119,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       }
     }
     user_list <- function(){
-      GET_JSON("/people")
+      tibblify(GET_JSON("/people"))
     }
     user_get <- function(name = username){
       endpoint <- paste0('/user/', curl_escape(name))
@@ -109,7 +131,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       invisible()
     }
     view_list <- function(){
-      info()$views
+      tibblify(info()$views)
     }
     view_get <- function(name){
       endpoint <- sprintf('/view/%s/config.xml', curl_escape(name))
@@ -131,4 +153,9 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
 
 jenkins_pat <- function(){
   Sys.getenv('JENKINS_PAT')
+}
+
+tibblify <- function(df){
+  class(df) <- c("tbl_df", "tbl", "data.frame")
+  df
 }

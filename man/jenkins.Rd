@@ -8,14 +8,37 @@ jenkins(server = "http://jenkins.ropensci.org", username = "jeroen",
   token = jenkins_pat(), verbose = FALSE)
 }
 \arguments{
-\item{server}{naked url of the server}
+\item{server}{base url of the jenkins server}
 
-\item{username}{name of the user to login}
+\item{username}{name of the jenkins user to login}
 
-\item{token}{authentication token (or password)}
+\item{token}{authentication token (or password) for your jenkins server.}
 
-\item{verbose}{show http output}
+\item{verbose}{print http output for debugging}
 }
 \description{
 Some wrappers to control jobs and builds on a Jenkins server.
+}
+\examples{
+\donttest{ # Make a connection
+jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
+
+# Supported operations
+jk$info()
+jk$job_build(name)
+jk$job_build_all(wait = 0.5)
+jk$job_create(name, xml_string)
+jk$job_delete(name)
+jk$job_get(name)
+jk$job_list()
+jk$job_update(name, xml_string)
+jk$user_get(name = username)
+jk$user_list()
+jk$view_create(name, xml_string)
+jk$view_delete(name)
+jk$view_get(name)
+jk$view_list()
+jk$view_update(name, xml_string)
+}
+
 }
