@@ -2,20 +2,10 @@
 % Please edit documentation in R/client.R
 \name{jenkins}
 \alias{jenkins}
-\alias{config_template}
-\alias{view_template}
-\alias{sync_jenkins_ropensci}
 \title{Jenkins}
 \usage{
 jenkins(server = "http://jenkins.ropensci.org", username = "jeroen",
   token = jenkins_pat(), verbose = FALSE)
-
-config_template(git_url)
-
-view_template(view_jobs)
-
-sync_jenkins_ropensci(update_jobs = FALSE, remove_jobs = TRUE,
-  update_views = TRUE)
 }
 \arguments{
 \item{server}{naked url of the server}
@@ -25,16 +15,6 @@ sync_jenkins_ropensci(update_jobs = FALSE, remove_jobs = TRUE,
 \item{token}{authentication token (or password)}
 
 \item{verbose}{show http output}
-
-\item{git_url}{HTTPS git url of the target repository}
-
-\item{view_jobs}{Character vector with jobs to add to this view}
-
-\item{update_jobs}{update the xml config of existing repos.}
-
-\item{remove_jobs}{delete jobs that are no longer in the registry}
-
-\item{update_views}{update the views (per-author package list)}
 }
 \description{
 Some wrappers to control jobs and builds on a Jenkins server.
