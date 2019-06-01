@@ -35,8 +35,6 @@ sync_jenkins_ropensci(update_jobs = FALSE, remove_jobs = TRUE,
 \item{remove_jobs}{delete jobs that are no longer in the registry}
 
 \item{update_views}{update the views (per-author package list)}
-
-\item{view_name}{Full name (with spaces) of the view}
 }
 \description{
 Some wrappers to control jobs and builds on a Jenkins server.

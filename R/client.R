@@ -86,12 +86,12 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       invisible()
     }
     job_build_all <- function(wait = 0.5){
-      jobs <- jk$job_list()$name
+      jobs <- job_list()$name
       msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
-      if(isTRUE(askYesNo(msg))){
+      if(isTRUE(utils::askYesNo(msg))){
         lapply(jobs, function(name){
           cat("Triggering build for:", name, "\n")
-          jk$job_build(name)
+          job_build(name)
           Sys.sleep(wait)
         })
       }
@@ -141,7 +141,6 @@ config_template <- function(git_url){
 }
 
 #' @export
-#' @param view_name Full name (with spaces) of the view
 #' @param view_jobs Character vector with jobs to add to this view
 #' @rdname jenkins
 view_template <- function(view_jobs){
