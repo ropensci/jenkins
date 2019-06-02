@@ -94,8 +94,9 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       POST_XML(endpoint = endpoint)
       invisible()
     }
-    job_status<- function(name){
-      GET_JSON(sprintf('/job/%s/lastBuild', curl_escape(name)))
+    job_status <- function(name, completed = FALSE){
+      buildname <- ifelse(completed, 'lastCompletedBuild', 'lastBuild')
+      GET_JSON(sprintf('/job/%s/%s', curl_escape(name), buildname))
     }
     job_create <- function(name, xml_string){
       endpoint <- sprintf("/createItem?name=%s", curl_escape(name))
