@@ -1,0 +1,5 @@
+language: R
+fortran: false
+pandoc: false
+latex: false
+cache: packages
