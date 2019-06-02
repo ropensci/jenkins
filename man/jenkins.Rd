@@ -22,6 +22,7 @@ default access token via the \code{JENKINS_PAT} environment variable.
 }
 \section{Methods}{
 
+\code{# jk <- jenkins("https://dev.ropensci.org", user = "jeroen")}
 \Sexpr[results=verbatim, stage=build, echo=FALSE]{jenkins::jenkins('dummy')}
 }
 
@@ -32,9 +33,7 @@ jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 # Do stuff
 jk$info()
 jk$job_build('magick')
-jk$job_status('magick')
-}
-
+jk$job_status('magick') }
 }
 \references{
 \url{https://wiki.jenkins.io/display/JENKINS/Terminology}
