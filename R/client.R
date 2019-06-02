@@ -124,7 +124,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       }
     }
     user_list <- function(){
-      tibblify(GET_JSON("/people"))
+      tibblify(GET_JSON("/asynchPeople")$users)
     }
     user_get <- function(name = username){
       endpoint <- paste0('/user/', curl_escape(name))
