@@ -2,7 +2,7 @@
 % Please edit documentation in R/client.R
 \name{jenkins}
 \alias{jenkins}
-\title{Jenkins}
+\title{Jenkins Client}
 \usage{
 jenkins(server = "http://jenkins.ropensci.org", username = "jeroen",
   token = jenkins_pat(), verbose = FALSE)
@@ -17,8 +17,8 @@ jenkins(server = "http://jenkins.ropensci.org", username = "jeroen",
 \item{verbose}{print http output for debugging}
 }
 \description{
-Managing jobs and builds on a Jenkins server. You can set a global Jenkins
-access token via the \code{JENKINS_PAT} environment variable.
+Simple client for managing jobs and builds on a Jenkins server. Set a
+default access token via the \code{JENKINS_PAT} environment variable.
 }
 \section{Methods}{
 

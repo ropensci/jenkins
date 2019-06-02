@@ -1,7 +1,7 @@
-#' Jenkins
+#' Jenkins Client
 #'
-#' Managing jobs and builds on a Jenkins server. You can set a global Jenkins
-#' access token via the \code{JENKINS_PAT} environment variable.
+#' Simple client for managing jobs and builds on a Jenkins server. Set a
+#' default access token via the \code{JENKINS_PAT} environment variable.
 #'
 #' @section Methods:
 #' \Sexpr[results=verbatim, stage=build, echo=FALSE]{jenkins::jenkins('dummy')}
