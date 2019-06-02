@@ -42,3 +42,6 @@ jk$view_update(name, xml_string)
 }
 
 }
+\references{
+\url{https://wiki.jenkins.io/display/JENKINS/Terminology}
+}

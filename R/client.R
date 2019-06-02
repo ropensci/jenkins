@@ -2,6 +2,8 @@
 #'
 #' Some wrappers to control jobs and builds on a Jenkins server.
 #'
+#' @references \url{https://wiki.jenkins.io/display/JENKINS/Terminology}
+#'
 #' @examples
 #' \donttest{ # Make a connection
 #' jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
@@ -84,20 +86,23 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     job_list <- function(){
       tibblify(info()$jobs)
     }
-    job_get <- function(name){
+    job_get_config <- function(name){
       GET_DATA(sprintf('/job/%s/config.xml', curl_escape(name)))
     }
-    job_build <- function(name){
+    job_trigger_build <- function(name){
       endpoint <- sprintf('/job/%s/build', curl_escape(name))
       POST_XML(endpoint = endpoint)
       invisible()
+    }
+    job_get_lastbuild <- function(name){
+      GET_JSON(sprintf('/job/%s/lastBuild', curl_escape(name)))
     }
     job_create <- function(name, xml_string){
       endpoint <- sprintf("/createItem?name=%s", curl_escape(name))
       POST_XML(endpoint = endpoint, data = xml_string)
       invisible()
     }
-    job_update <- function(name, xml_string){
+    job_update_config <- function(name, xml_string){
       endpoint <- sprintf('/job/%s/config.xml', curl_escape(name))
       POST_XML(endpoint = endpoint, data = xml_string)
       invisible()
@@ -107,14 +112,14 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       POST_XML(endpoint = endpoint)
       invisible()
     }
-    job_build_all <- function(wait = 0.5){
+    job_build_all <- function(delay = 0.5){
       jobs <- job_list()$name
       msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
       if(isTRUE(utils::askYesNo(msg))){
         lapply(jobs, function(name){
           cat("Triggering build for:", name, "\n")
           job_build(name)
-          Sys.sleep(wait)
+          Sys.sleep(delay)
         })
       }
     }
