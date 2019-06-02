@@ -1,29 +1,21 @@
 #' Jenkins
 #'
-#' Some wrappers to control jobs and builds on a Jenkins server.
+#' Managing jobs and builds on a Jenkins server. You can set a global Jenkins
+#' access token via the \code{JENKINS_PAT} environment variable.
+#'
+#' @section Methods:
+#' \Sexpr[results=verbatim, stage=build, echo=FALSE]{jenkins::jenkins('dummy')}
 #'
 #' @references \url{https://wiki.jenkins.io/display/JENKINS/Terminology}
 #'
 #' @examples
-#' \donttest{ # Make a connection
+#' \donttest{# Make a connection
 #' jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 #'
-#' # Supported operations
+#' # Do stuff
 #' jk$info()
-#' jk$job_build(name)
-#' jk$job_build_all(wait = 0.5)
-#' jk$job_create(name, xml_string)
-#' jk$job_delete(name)
-#' jk$job_get(name)
-#' jk$job_list()
-#' jk$job_update(name, xml_string)
-#' jk$user_get(name = username)
-#' jk$user_list()
-#' jk$view_create(name, xml_string)
-#' jk$view_delete(name)
-#' jk$view_get(name)
-#' jk$view_list()
-#' jk$view_update(name, xml_string)
+#' jk$job_build('magick')
+#' jk$job_status('magick')
 #' }
 #'
 #' @export
@@ -76,7 +68,8 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
   }
 
   # Test server works
-  GET_JSON()
+  if(server != "dummy")
+    GET_JSON()
 
   # Exported methods
   local({
@@ -153,7 +146,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       POST_XML(endpoint = endpoint)
       invisible()
     }
-    structure(environment(), class=c("jenkins", "jeroen", "environment"))
+    structure(environment(), class = c("jenkins", "jeroen", "environment"))
   })
 }
 
@@ -162,6 +155,10 @@ jenkins_pat <- function(){
 }
 
 tibblify <- function(df){
-  class(df) <- c("tbl_df", "tbl", "data.frame")
+  if(!is.data.frame(df)){
+    warning("Argument is not a data frame")
+  } else {
+    class(df) <- c("tbl_df", "tbl", "data.frame")
+  }
   df
 }

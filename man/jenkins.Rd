@@ -17,28 +17,22 @@ jenkins(server = "http://jenkins.ropensci.org", username = "jeroen",
 \item{verbose}{print http output for debugging}
 }
 \description{
-Some wrappers to control jobs and builds on a Jenkins server.
+Managing jobs and builds on a Jenkins server. You can set a global Jenkins
+access token via the \code{JENKINS_PAT} environment variable.
 }
+\section{Methods}{
+
+\Sexpr[results=verbatim, stage=build, echo=FALSE]{jenkins::jenkins('dummy')}
+}
+
 \examples{
-\donttest{ # Make a connection
+\donttest{# Make a connection
 jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 
-# Supported operations
+# Do stuff
 jk$info()
-jk$job_build(name)
-jk$job_build_all(wait = 0.5)
-jk$job_create(name, xml_string)
-jk$job_delete(name)
-jk$job_get(name)
-jk$job_list()
-jk$job_update(name, xml_string)
-jk$user_get(name = username)
-jk$user_list()
-jk$view_create(name, xml_string)
-jk$view_delete(name)
-jk$view_get(name)
-jk$view_list()
-jk$view_update(name, xml_string)
+jk$job_build('magick')
+jk$job_status('magick')
 }
 
 }
