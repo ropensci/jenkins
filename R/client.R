@@ -86,15 +86,15 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     job_list <- function(){
       tibblify(info()$jobs)
     }
-    job_get_config <- function(name){
+    job_config <- function(name){
       GET_DATA(sprintf('/job/%s/config.xml', curl_escape(name)))
     }
-    job_trigger_build <- function(name){
+    job_build <- function(name){
       endpoint <- sprintf('/job/%s/build', curl_escape(name))
       POST_XML(endpoint = endpoint)
       invisible()
     }
-    job_get_lastbuild <- function(name){
+    job_status<- function(name){
       GET_JSON(sprintf('/job/%s/lastBuild', curl_escape(name)))
     }
     job_create <- function(name, xml_string){
@@ -102,7 +102,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       POST_XML(endpoint = endpoint, data = xml_string)
       invisible()
     }
-    job_update_config <- function(name, xml_string){
+    job_update <- function(name, xml_string){
       endpoint <- sprintf('/job/%s/config.xml', curl_escape(name))
       POST_XML(endpoint = endpoint, data = xml_string)
       invisible()
