@@ -4,7 +4,8 @@ Title: Simple Jenkins Client for R
 Version: 0.1
 Author: Jeroen Ooms
 Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
-Description: Control jobs and builds on a Jenkins server.
+Description: Managing jobs and builds on your jenkins server. Create or 
+    update projects, control builds and queues, inspect logs, and much more.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Imports: 
