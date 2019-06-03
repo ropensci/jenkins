@@ -80,13 +80,15 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     }
     build_start <- function(job_name){
       endpoint <- sprintf('/job/%s/build', curl_escape(job_name))
-      POST_XML(endpoint = endpoint)
+      url <- POST_XML(endpoint = endpoint)
+      queue_id <- gsub(".*/([0-9]+)/?$", '\\1', url)
+      queue_info(queue_id)
     }
     build_start_all <- function(delay = 0.5){
       jobs <- project_list()$name
       msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
       if(isTRUE(utils::askYesNo(msg))){
-        sapply(jobs, function(job_name){
+        lapply(jobs, function(job_name){
           cat("Triggering build for:", job_name, "\n")
           build_start(job_name)
           Sys.sleep(delay)
@@ -134,27 +136,27 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     user_list <- function(){
       tibblify(GET_JSON("/asynchPeople")$users)
     }
-    user_info <- function(job_name = username){
-      endpoint <- paste0('/user/', curl_escape(job_name))
+    user_info <- function(user_name = username){
+      endpoint <- paste0('/user/', curl_escape(user_name))
       GET_JSON(endpoint)
     }
-    view_create <- function(job_name, xml_string){
-      endpoint <- sprintf("/createView?name=%s", curl_escape(job_name))
+    view_create <- function(view_name, xml_string){
+      endpoint <- sprintf("/createView?name=%s", curl_escape(view_name))
       POST_XML(endpoint = endpoint, data = xml_string)
     }
     view_list <- function(){
       tibblify(info()$views)
     }
-    view_info <- function(job_name){
-      endpoint <- sprintf('/view/%s/config.xml', curl_escape(job_name))
+    view_info <- function(view_name){
+      endpoint <- sprintf('/view/%s/config.xml', curl_escape(view_name))
       GET_DATA(endpoint)
     }
-    view_update <- function(job_name, xml_string){
-      endpoint <- sprintf('/view/%s/config.xml', curl_escape(job_name))
+    view_update <- function(view_name, xml_string){
+      endpoint <- sprintf('/view/%s/config.xml', curl_escape(view_name))
       POST_XML(endpoint = endpoint, data = xml_string)
     }
-    view_delete <- function(job_name){
-      endpoint <- sprintf('/view/%s/doDelete', curl_escape(job_name))
+    view_delete <- function(view_name){
+      endpoint <- sprintf('/view/%s/doDelete', curl_escape(view_name))
       POST_XML(endpoint = endpoint)
     }
     queue_list <- function(){

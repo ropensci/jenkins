@@ -30,6 +30,7 @@ jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 
 # Do stuff
 jk$info()
-jk$job_build('magick')
-jk$job_status('magick')
+jk$build_start('magick')
+jk$build_info('magick')
 ```
+
