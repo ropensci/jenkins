@@ -43,9 +43,12 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     return(text)
   }
 
-  POST_XML <- function(endpoint = "/", data = NULL){
+  POST_XML <- function(endpoint = "/", data = NULL, handle_opts = NULL){
     handle <- curl::new_handle(username = username, password = token, verbose = verbose,
                                httpauth = 1L, post = TRUE)
+    if(length(handle_opts)){
+      curl::handle_setopt(handle, .list = handle_opts)
+    }
     if(length(data)){
       buf <- charToRaw(data)
       size <- length(buf)
@@ -120,6 +123,14 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       endpoint <- sprintf('/job/%s/doDelete', curl_escape(name))
       POST_XML(endpoint = endpoint)
     }
+    project_enable <- function(name){
+      endpoint <- sprintf('/job/%s/enable', curl_escape(name))
+      POST_XML(endpoint = endpoint)
+    }
+    project_disable <- function(name){
+      endpoint <- sprintf('/job/%s/disable', curl_escape(name))
+      POST_XML(endpoint = endpoint)
+    }
     user_list <- function(){
       tibblify(GET_JSON("/asynchPeople")$users)
     }
@@ -146,6 +157,27 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     view_delete <- function(name){
       endpoint <- sprintf('/view/%s/doDelete', curl_escape(name))
       POST_XML(endpoint = endpoint)
+      invisible()
+    }
+    user_get <- function(name = username){
+      endpoint <- paste0('/user/', curl_escape(name))
+      GET_JSON(endpoint)
+    }
+    queue_list <- function(){
+      out <- GET_JSON('/queue')
+      tibblify(as.data.frame(out$items))
+    }
+    queue_info <- function(queue_id){
+
+    }
+    queue_cancel <- function(queue_id){
+      # Bug in Jenkins, it redirects to the just deleted project
+      opts <- list(followlocation = FALSE)
+      POST_XML(paste0('/queue/cancelItem?id=', queue_id), handle_opts = opts)
+    }
+    queue_cancel_all <- function(){
+      queue <- queue_list()
+      lapply(queue$id, queue_cancel)
       invisible()
     }
     structure(environment(), class = c("jenkins", "jeroen", "environment"))
