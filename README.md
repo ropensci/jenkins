@@ -29,7 +29,7 @@ Now you connect to your Jenkins server and do stuff:
 jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 
 # Do stuff
-jk$info()
+jk$server_info()
 jk$build_start('magick')
 jk$build_info('magick')
 ```

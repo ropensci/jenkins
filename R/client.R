@@ -14,9 +14,9 @@
 #' jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 #'
 #' # Do stuff
-#' jk$info()
-#' jk$job_build('magick')
-#' jk$job_status('magick') }
+#' jk$server_info()
+#' jk$build_start('magick')
+#' jk$build_info('magick') }
 #' @export
 #' @import curl
 #' @rdname jenkins
@@ -75,7 +75,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
 
   # Exported methods
   local({
-    info <- function(){
+    server_info <- function(){
       GET_JSON()
     }
     build_start <- function(job_name){
@@ -95,20 +95,20 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
         })
       }
     }
-    build_info <- function(job_name, build_number = 'lastBuild'){
+    build_info <- function(job_name, build_id = 'lastBuild'){
       # buildno can be integer or e.g. 'lastCompletedBuild'
-      GET_JSON(sprintf('/job/%s/%s', curl_escape(job_name), as.character(build_number)))
+      GET_JSON(sprintf('/job/%s/%s', curl_escape(job_name), as.character(build_id)))
     }
-    build_log <- function(job_name, build_number = 'lastBuild'){
+    build_log <- function(job_name, build_id = 'lastBuild'){
       GET_DATA(sprintf('/job/%s/%s/logText/progressiveText',
-                       curl_escape(job_name), as.character(build_number)))
+                       curl_escape(job_name), as.character(build_id)))
     }
-    build_stop <- function(job_name, build_number = 'lastBuild'){
+    build_stop <- function(job_name, build_id = 'lastBuild'){
       POST_XML(sprintf('/job/%s/%s/stop',
-                       curl_escape(job_name), as.character(build_number)))
+                       curl_escape(job_name), as.character(build_id)))
     }
     project_list <- function(){
-      tibblify(info()$jobs)
+      tibblify(server_info()$jobs)
     }
     project_config <- function(job_name){
       GET_DATA(sprintf('/job/%s/config.xml', curl_escape(job_name)))
@@ -145,7 +145,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       POST_XML(endpoint = endpoint, data = xml_string)
     }
     view_list <- function(){
-      tibblify(info()$views)
+      tibblify(server_info()$views)
     }
     view_info <- function(view_name){
       endpoint <- sprintf('/view/%s/config.xml', curl_escape(view_name))
