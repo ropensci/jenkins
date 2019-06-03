@@ -31,9 +31,18 @@ default access token via the \code{JENKINS_PAT} environment variable.
 jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 
 # Do stuff
-jk$info()
-jk$job_build('magick')
-jk$job_status('magick') }
+jk$server_info()
+jk$build_start('magick')
+
+# It's now in the queue
+jk$queue_list()
+
+# Check build status
+jk$build_info('magick')
+
+# Get latest build log
+jk$build_log('magick', build_id = 'lastCompletedBuild')
+}
 }
 \references{
 \url{https://wiki.jenkins.io/display/JENKINS/Terminology}

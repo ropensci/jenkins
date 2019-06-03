@@ -16,7 +16,16 @@
 #' # Do stuff
 #' jk$server_info()
 #' jk$build_start('magick')
-#' jk$build_info('magick') }
+#'
+#' # It's now in the queue
+#' jk$queue_list()
+#'
+#' # Check build status
+#' jk$build_info('magick')
+#'
+#' # Get latest build log
+#' jk$build_log('magick', build_id = 'lastCompletedBuild')
+#' }
 #' @export
 #' @import curl
 #' @rdname jenkins
