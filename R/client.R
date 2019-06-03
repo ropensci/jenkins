@@ -63,7 +63,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     if(req$status >= 400){
       stop(sprintf("HTTP ERROR %d: %s",req$status, text), call. = FALSE)
     }
-    return(text)
+    invisible(text)
   }
 
   # Test server works
@@ -75,37 +75,11 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     info <- function(){
       GET_JSON()
     }
-    job_list <- function(){
-      tibblify(info()$jobs)
-    }
-    job_config <- function(name){
-      GET_DATA(sprintf('/job/%s/config.xml', curl_escape(name)))
-    }
-    job_build <- function(name){
+    build_start <- function(name){
       endpoint <- sprintf('/job/%s/build', curl_escape(name))
       POST_XML(endpoint = endpoint)
-      invisible()
     }
-    job_status <- function(name, completed = FALSE){
-      buildname <- ifelse(completed, 'lastCompletedBuild', 'lastBuild')
-      GET_JSON(sprintf('/job/%s/%s', curl_escape(name), buildname))
-    }
-    job_create <- function(name, xml_string){
-      endpoint <- sprintf("/createItem?name=%s", curl_escape(name))
-      POST_XML(endpoint = endpoint, data = xml_string)
-      invisible()
-    }
-    job_update <- function(name, xml_string){
-      endpoint <- sprintf('/job/%s/config.xml', curl_escape(name))
-      POST_XML(endpoint = endpoint, data = xml_string)
-      invisible()
-    }
-    job_delete <- function(name){
-      endpoint <- sprintf('/job/%s/doDelete', curl_escape(name))
-      POST_XML(endpoint = endpoint)
-      invisible()
-    }
-    job_build_all <- function(delay = 0.5){
+    build_start_all <- function(delay = 0.5){
       jobs <- job_list()$name
       msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
       if(isTRUE(utils::askYesNo(msg))){
@@ -115,6 +89,36 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
           Sys.sleep(delay)
         })
       }
+    }
+    build_status <- function(name, build_number = 'lastBuild'){
+      # buildno can be integer or e.g. 'lastCompletedBuild'
+      GET_JSON(sprintf('/job/%s/%s', curl_escape(name), as.character(build_number)))
+    }
+    build_log <- function(name, build_number = 'lastBuild'){
+      GET_DATA(sprintf('/job/%s/%s/logText/progressiveText',
+                       curl_escape(name), as.character(build_number)))
+    }
+    build_stop <- function(name, build_number = 'lastBuild'){
+      POST_XML(sprintf('/job/%s/%s/stop',
+                       curl_escape(name), as.character(build_number)))
+    }
+    project_list <- function(){
+      tibblify(info()$jobs)
+    }
+    project_config <- function(name){
+      GET_DATA(sprintf('/job/%s/config.xml', curl_escape(name)))
+    }
+    project_create <- function(name, xml_string){
+      endpoint <- sprintf("/createItem?name=%s", curl_escape(name))
+      POST_XML(endpoint = endpoint, data = xml_string)
+    }
+    project_update <- function(name, xml_string){
+      endpoint <- sprintf('/job/%s/config.xml', curl_escape(name))
+      POST_XML(endpoint = endpoint, data = xml_string)
+    }
+    project_delete <- function(name){
+      endpoint <- sprintf('/job/%s/doDelete', curl_escape(name))
+      POST_XML(endpoint = endpoint)
     }
     user_list <- function(){
       tibblify(GET_JSON("/asynchPeople")$users)
@@ -126,7 +130,6 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     view_create <- function(name, xml_string){
       endpoint <- sprintf("/createView?name=%s", curl_escape(name))
       POST_XML(endpoint = endpoint, data = xml_string)
-      invisible()
     }
     view_list <- function(){
       tibblify(info()$views)
