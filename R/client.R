@@ -66,7 +66,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     if(req$status >= 400){
       stop(sprintf("HTTP ERROR %d: %s",req$status, text), call. = FALSE)
     }
-    invisible(text)
+    curl::parse_headers_list(req$headers)$location
   }
 
   # Test server works
@@ -93,7 +93,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
         })
       }
     }
-    build_status <- function(name, build_number = 'lastBuild'){
+    build_info <- function(name, build_number = 'lastBuild'){
       # buildno can be integer or e.g. 'lastCompletedBuild'
       GET_JSON(sprintf('/job/%s/%s', curl_escape(name), as.character(build_number)))
     }
@@ -134,7 +134,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     user_list <- function(){
       tibblify(GET_JSON("/asynchPeople")$users)
     }
-    user_get <- function(name = username){
+    user_info <- function(name = username){
       endpoint <- paste0('/user/', curl_escape(name))
       GET_JSON(endpoint)
     }
@@ -145,7 +145,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     view_list <- function(){
       tibblify(info()$views)
     }
-    view_get <- function(name){
+    view_info <- function(name){
       endpoint <- sprintf('/view/%s/config.xml', curl_escape(name))
       GET_DATA(endpoint)
     }
@@ -159,16 +159,12 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       POST_XML(endpoint = endpoint)
       invisible()
     }
-    user_get <- function(name = username){
-      endpoint <- paste0('/user/', curl_escape(name))
-      GET_JSON(endpoint)
-    }
     queue_list <- function(){
       out <- GET_JSON('/queue')
       tibblify(as.data.frame(out$items))
     }
     queue_info <- function(queue_id){
-
+      GET_JSON(paste0('/queue/item/', queue_id))
     }
     queue_cancel <- function(queue_id){
       # Bug in Jenkins, it redirects to the just deleted project
