@@ -8,7 +8,9 @@
 
 > Simple Jenkins Client for R
 
-Managing jobs and builds on your jenkins server. Create or update projects, control builds and queues, inspect logs, and much more.
+Manage jobs and builds on your Jenkins CI server <https://jenkins.io/>. 
+Create and edit projects, trigger builds, manage build queues, download build
+logs, and much more.
 
 ## How to use
 
