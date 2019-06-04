@@ -8,7 +8,8 @@ Description: Manage jobs and builds on your Jenkins CI server <https://jenkins.i
     Create and edit projects, trigger builds, manage build queues, download build
     logs, and much more.
 License: MIT + file LICENSE
-URL: https://docs.ropensci.org/jenkins/
+URL: https://docs.ropensci.org/jenkins/ (website),
+    https://github.com/ropensci/jenkins
 BugReports: https://github.com/ropensci/jenkins/issues
 Encoding: UTF-8
 Imports: 
