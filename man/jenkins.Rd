@@ -26,7 +26,7 @@ default access token via the \code{JENKINS_PAT} environment variable.
 }
 
 \examples{
-\donttest{# Make a connection
+\dontrun{# This requires a jenkins server
 jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 
 # Do stuff

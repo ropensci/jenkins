@@ -1,6 +1,6 @@
 Package: jenkins
 Type: Package
-Title: Simple Jenkins Client
+Title: Simple Jenkins Client for R
 Version: 1.0
 Author: Jeroen Ooms
 Maintainer: Jeroen Ooms <jeroen@berkeley.edu>

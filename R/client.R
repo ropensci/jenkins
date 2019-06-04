@@ -9,7 +9,7 @@
 #' @references \url{https://wiki.jenkins.io/display/JENKINS/Terminology}
 #'
 #' @examples
-#' \donttest{# Make a connection
+#' \dontrun{# This requires a jenkins server
 #' jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 #'
 #' # Do stuff
