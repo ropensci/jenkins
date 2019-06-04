@@ -184,6 +184,13 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       if(length(queue) && length(queue$id))
         sapply(queue$id, queue_cancel)
     }
+    node_list <- function(){
+      GET_JSON('/computer/api/json')
+    }
+    node_info <- function(node_name = "master"){
+      node_name <- ifelse(identical(node_name, 'master'), '(master)', 'master')
+      GET_JSON(paste0('/computer/', curl_escape(node_name)))
+    }
     structure(environment(), class = c("jenkins", "jeroen", "environment"))
   })
 }
