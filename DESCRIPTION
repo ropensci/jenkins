@@ -7,6 +7,8 @@ Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
 Description: Managing jobs and builds on your jenkins server. Create or 
     update projects, control builds and queues, inspect logs, and much more.
 License: MIT + file LICENSE
+URL: https://docs.ropensci.org/jenkins/
+BugReports: https://github.com/ropensci/jenkins/issues
 Encoding: UTF-8
 Imports: 
     curl,
