@@ -22,7 +22,6 @@ default access token via the \code{JENKINS_PAT} environment variable.
 }
 \section{Methods}{
 
-\code{# jk <- jenkins("https://dev.ropensci.org", user = "jeroen")}
 \Sexpr[results=rd, stage=build, echo=FALSE]{jenkins:::generate_rd()}
 }
 

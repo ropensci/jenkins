@@ -4,7 +4,6 @@
 #' default access token via the \code{JENKINS_PAT} environment variable.
 #'
 #' @section Methods:
-#' \code{# jk <- jenkins("https://dev.ropensci.org", user = "jeroen")}
 #' \Sexpr[results=rd, stage=build, echo=FALSE]{jenkins:::generate_rd()}
 #'
 #' @references \url{https://wiki.jenkins.io/display/JENKINS/Terminology}
@@ -204,5 +203,5 @@ tibblify <- function(df){
 
 generate_rd <- function(){
   out <- paste(utils::capture.output(jenkins("dummy")), collapse = "\n")
-  paste("\\preformatted{", out, "}\n", sep = "\n")
+  paste("\\preformatted{", "## jk <- jenkins('https://ci.yourserver.com')", out, "}\n", sep = "\n")
 }
