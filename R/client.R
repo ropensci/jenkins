@@ -14,7 +14,7 @@
 #'
 #' # Do stuff
 #' jk$server_info()
-#' jk$build_start('magick')
+#' jk$project_build('magick')
 #'
 #' # It's now in the queue
 #' jk$queue_list()
@@ -86,23 +86,6 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     server_info <- function(){
       GET_JSON()
     }
-    build_start <- function(job_name){
-      endpoint <- sprintf('/job/%s/build', curl_escape(job_name))
-      url <- POST_XML(endpoint = endpoint)
-      queue_id <- gsub(".*/([0-9]+)/?$", '\\1', url)
-      queue_info(queue_id)
-    }
-    build_start_all <- function(delay = 0.5){
-      jobs <- project_list()$name
-      msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
-      if(isTRUE(utils::askYesNo(msg))){
-        lapply(jobs, function(job_name){
-          cat("Triggering build for:", job_name, "\n")
-          build_start(job_name)
-          Sys.sleep(delay)
-        })
-      }
-    }
     build_info <- function(job_name, build_id = 'lastBuild'){
       # buildno can be integer or e.g. 'lastCompletedBuild'
       GET_JSON(sprintf('/job/%s/%s', curl_escape(job_name), as.character(build_id)))
@@ -114,6 +97,23 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     build_stop <- function(job_name, build_id = 'lastBuild'){
       POST_XML(sprintf('/job/%s/%s/stop',
                        curl_escape(job_name), as.character(build_id)))
+    }
+    project_build <- function(job_name){
+      endpoint <- sprintf('/job/%s/build', curl_escape(job_name))
+      url <- POST_XML(endpoint = endpoint)
+      queue_id <- gsub(".*/([0-9]+)/?$", '\\1', url)
+      queue_info(queue_id)
+    }
+    project_build_all <- function(delay = 0.5){
+      jobs <- project_list()$name
+      msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
+      if(isTRUE(utils::askYesNo(msg))){
+        lapply(jobs, function(job_name){
+          cat("Triggering build for:", job_name, "\n")
+          project_build(job_name)
+          Sys.sleep(delay)
+        })
+      }
     }
     project_list <- function(){
       tibblify(server_info()$jobs)

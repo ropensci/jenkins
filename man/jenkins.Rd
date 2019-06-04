@@ -31,7 +31,7 @@ jk <- jenkins(server = 'http://jenkins.ropensci.org', username = 'jeroen')
 
 # Do stuff
 jk$server_info()
-jk$build_start('magick')
+jk$project_build('magick')
 
 # It's now in the queue
 jk$queue_list()
