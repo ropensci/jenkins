@@ -5,7 +5,7 @@
 #'
 #' @section Methods:
 #' \code{# jk <- jenkins("https://dev.ropensci.org", user = "jeroen")}
-#' \Sexpr[results=verbatim, stage=build, echo=FALSE]{jenkins::jenkins('dummy')}
+#' \Sexpr[results=rd, stage=build, echo=FALSE]{jenkins:::generate_rd()}
 #'
 #' @references \url{https://wiki.jenkins.io/display/JENKINS/Terminology}
 #'
@@ -200,4 +200,9 @@ tibblify <- function(df){
     class(df) <- c("tbl_df", "tbl", "data.frame")
   }
   df
+}
+
+generate_rd <- function(){
+  out <- paste(utils::capture.output(jenkins("dummy")), collapse = "\n")
+  paste("\\preformatted{", out, "}\n", sep = "\n")
 }
