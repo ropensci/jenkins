@@ -58,15 +58,19 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       curl::handle_setopt(handle, .list = handle_opts)
     }
     if(length(data)){
-      buf <- charToRaw(data)
-      size <- length(buf)
-      con <- rawConnection(buf, open = "rb")
-      on.exit(close(con))
-      readfunction <- function(n, ...){
-        readBin(con = con, raw(), n = n)
+      if(is.character(data)){
+        buf <- charToRaw(data)
+        size <- length(buf)
+        con <- rawConnection(buf, open = "rb")
+        on.exit(close(con))
+        readfunction <- function(n, ...){
+          readBin(con = con, raw(), n = n)
+        }
+        handle_setopt(handle, readfunction = readfunction, postfieldsize_large = size)
+        handle_setheaders(handle, "Content-Type" = "application/xml")
+      } else if(is.list(data)){
+        handle_setform(handle = handle, .list = data)
       }
-      handle_setopt(handle, readfunction = readfunction, postfieldsize_large = size)
-      handle_setheaders(handle, "Content-Type" = "application/xml")
     }
     url <- paste0(server, sub("/$", "", endpoint))
     req <- curl::curl_fetch_memory(url, handle = handle)
@@ -98,16 +102,18 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       POST_XML(sprintf('/job/%s/%s/stop',
                        curl_escape(job_name), as.character(build_id)))
     }
-    project_build <- function(job_name){
-      endpoint <- sprintf('/job/%s/build', curl_escape(job_name))
-      url <- POST_XML(endpoint = endpoint)
+    project_build <- function(job_name, params = list(DISABLE_AUTO_FLUSH = 'true')){
+      endpoint <- sprintf('/job/%s/buildWithParameters', curl_escape(job_name))
+      url <- POST_XML(endpoint = endpoint, data = params)
       queue_id <- gsub(".*/([0-9]+)/?$", '\\1', url)
       queue_info(queue_id)
     }
-    project_build_all <- function(delay = 0.5){
+    project_build_all <- function(delay = 0.5, shuffle = FALSE){
       jobs <- project_list()$name
       msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
       if(isTRUE(utils::askYesNo(msg))){
+        if(isTRUE(shuffle))
+          jobs <- sample(jobs)
         lapply(jobs, function(job_name){
           cat("Triggering build for:", job_name, "\n")
           project_build(job_name)
