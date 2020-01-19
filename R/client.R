@@ -35,8 +35,10 @@
 jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
                     token = jenkins_pat(), verbose = FALSE){
   server <- gsub("/$", "", server)
-  GET_JSON <- function(endpoint = "/"){
+  GET_JSON <- function(endpoint = "/", args = NULL){
     endpoint <- paste0(sub("/$", "", endpoint), '/api/json')
+    if(length(args))
+      endpoint <- paste0(endpoint, "?", args)
     jsonlite::fromJSON(GET_DATA(endpoint = endpoint))
   }
 
@@ -122,7 +124,14 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       }
     }
     project_list <- function(){
-      tibblify(server_info()$jobs)
+      res <- GET_JSON('/', args = "tree=jobs[name,url,scm[userRemoteConfigs[url]]]")
+      df <- data.frame(
+        name = res$jobs$name,
+        url = res$jobs$url,
+        git = vapply(res$job$scm$userRemoteConfigs, function(x){x$url}, character(1)),
+        stringsAsFactors = FALSE
+      )
+      tibblify(df)
     }
     project_config <- function(job_name){
       GET_DATA(sprintf('/job/%s/config.xml', curl_escape(job_name)))

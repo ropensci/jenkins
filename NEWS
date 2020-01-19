@@ -1,0 +1,5 @@
+1.1
+  - jk$project_list() now includes git url
+
+1.0
+  - Initial CRAN release.
