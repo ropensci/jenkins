@@ -110,7 +110,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       queue_id <- gsub(".*/([0-9]+)/?$", '\\1', url)
       queue_info(queue_id)
     }
-    project_build_all <- function(delay = 0.5, shuffle = FALSE){
+    project_build_all <- function(delay = 0.5, shuffle = FALSE, keep_cache = TRUE){
       jobs <- project_list()$name
       msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
       if(isTRUE(utils::askYesNo(msg))){
@@ -118,7 +118,8 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
           jobs <- sample(jobs)
         lapply(jobs, function(job_name){
           cat("Triggering build for:", job_name, "\n")
-          project_build(job_name)
+          params <- list(DISABLE_AUTO_FLUSH = ifelse(keep_cache, 'true', 'false'))
+          project_build(job_name, params = params)
           Sys.sleep(delay)
         })
       }
