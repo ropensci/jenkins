@@ -104,13 +104,13 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
       POST_XML(sprintf('/job/%s/%s/stop',
                        curl_escape(job_name), as.character(build_id)))
     }
-    project_build <- function(job_name, params = list(DISABLE_AUTO_FLUSH = 'true')){
+    project_build <- function(job_name, params = list(KEEP_CACHE = 'true')){
       endpoint <- sprintf('/job/%s/buildWithParameters', curl_escape(job_name))
       url <- POST_XML(endpoint = endpoint, data = params)
       queue_id <- gsub(".*/([0-9]+)/?$", '\\1', url)
       queue_info(queue_id)
     }
-    project_build_all <- function(delay = 0.5, shuffle = FALSE, keep_cache = TRUE){
+    project_build_all <- function(delay = 0.5, shuffle = FALSE, keep_cache = TRUE, update_universe = FALSE){
       jobs <- project_list()$name
       msg <- sprintf("This will build %d jobs. Are you sure?", length(jobs))
       if(isTRUE(utils::askYesNo(msg))){
@@ -118,7 +118,10 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
           jobs <- sample(jobs)
         lapply(jobs, function(job_name){
           cat("Triggering build for:", job_name, "\n")
-          params <- list(DISABLE_AUTO_FLUSH = ifelse(keep_cache, 'true', 'false'))
+          params <- list(
+            KEEP_CACHE = ifelse(keep_cache, 'true', 'false'),
+            UPDATE_UNIVERSE = ifelse(update_universe, 'true', 'false')
+          )
           project_build(job_name, params = params)
           Sys.sleep(delay)
         })
