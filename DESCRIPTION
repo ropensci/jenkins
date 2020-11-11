@@ -1,7 +1,7 @@
 Package: jenkins
 Type: Package
 Title: Simple Jenkins Client for R
-Version: 1.0.9101
+Version: 1.0.9102
 Author: Jeroen Ooms
 Maintainer: Jeroen Ooms <jeroen@berkeley.edu>
 Description: Manage jobs and builds on your Jenkins CI server <https://jenkins.io/>. 
