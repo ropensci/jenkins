@@ -62,13 +62,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     if(length(data)){
       if(is.character(data)){
         buf <- charToRaw(data)
-        size <- length(buf)
-        con <- rawConnection(buf, open = "rb")
-        on.exit(close(con))
-        readfunction <- function(n, ...){
-          readBin(con = con, raw(), n = n)
-        }
-        handle_setopt(handle, readfunction = readfunction, postfieldsize_large = size)
+        handle_setopt(handle, postfields = buf)
         handle_setheaders(handle, "Content-Type" = "application/xml")
       } else if(is.list(data)){
         handle_setform(handle = handle, .list = data)
