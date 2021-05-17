@@ -55,18 +55,20 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
 
   POST_XML <- function(endpoint = "/", data = NULL, handle_opts = NULL){
     handle <- curl::new_handle(username = username, password = token, verbose = verbose,
-                               httpauth = 1L, post = TRUE)
+                               httpauth = 1L)
     if(length(handle_opts)){
       curl::handle_setopt(handle, .list = handle_opts)
     }
     if(length(data)){
       if(is.character(data)){
         buf <- charToRaw(data)
-        handle_setopt(handle, postfields = buf)
+        handle_setopt(handle, copypostfields = buf)
         handle_setheaders(handle, "Content-Type" = "application/xml")
       } else if(is.list(data)){
         handle_setform(handle = handle, .list = data)
       }
+    } else {
+      handle_setopt(handle, post = TRUE)
     }
     url <- paste0(server, sub("/$", "", endpoint))
     req <- curl::curl_fetch_memory(url, handle = handle)
