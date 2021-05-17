@@ -144,7 +144,8 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     }
     project_delete <- function(job_name){
       endpoint <- sprintf('/job/%s/doDelete', curl_escape(job_name))
-      POST_XML(endpoint = endpoint)
+      # NB: jenkins is sending an illegal redirect that results in 'necessary data rewind wasn't possible'
+      try(POST_XML(endpoint = endpoint))
     }
     project_enable <- function(job_name){
       endpoint <- sprintf('/job/%s/enable', curl_escape(job_name))
@@ -178,7 +179,7 @@ jenkins <- function(server = 'http://jenkins.ropensci.org', username = 'jeroen',
     }
     view_delete <- function(view_name){
       endpoint <- sprintf('/view/%s/doDelete', curl_escape(view_name))
-      POST_XML(endpoint = endpoint)
+      try(POST_XML(endpoint = endpoint))
     }
     queue_list <- function(){
       out <- GET_JSON('/queue')
